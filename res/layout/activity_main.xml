@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <TextView
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:text="Audio experiments">
+    </TextView>
+ 
+    <Button android:id="@+id/a_button"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:onClick="Audio1ButtonHandler"
+       android:text="Play">
+    </Button>
+ 
+     <RadioGroup android:id="@+id/radioGroup1" android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:orientation="vertical">
+       <RadioButton android:id="@+id/radioSound1" android:text="Sound1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content" />
+       <RadioButton android:id="@+id/radioSound2" android:text="Sound2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content" />
+    </RadioGroup>
+
+     <TextView
+         android:id="@+id/textView1"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="TextView" />
+    
+</LinearLayout>
