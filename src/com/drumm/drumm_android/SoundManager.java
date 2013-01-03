@@ -7,8 +7,6 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
 
-import com.example.soundsensor.R;
-
 public class SoundManager {
 	
 	private static final String TAG = "SoundManager";

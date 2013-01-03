@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.soundsensor"
+    package="com.drumm.drumm_android"
     android:versionCode="1"
     android:versionName="1.0" >
 

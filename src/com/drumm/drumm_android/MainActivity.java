@@ -20,8 +20,6 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.example.soundsensor.R;
-
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
@@ -40,42 +38,48 @@ public class MainActivity extends Activity {
          soundManager = new SoundManager(this, audioManager);
          
          BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-         Set <BluetoothDevice> devices = adapter.getBondedDevices();
-         BluetoothDevice actual;
-         for (BluetoothDevice bondedDevice : devices) {
-			Log.d("test", "Device name: " + bondedDevice.getName());
-			if(bondedDevice.getName().equals("RN42-B6CD")){
-				actual = adapter.getRemoteDevice(bondedDevice.getAddress());
-				try {
-		            adapter.cancelDiscovery();
-
-					 actual.createRfcommSocketToServiceRecord(MY_UUID);
-					Method m = actual.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-					BluetoothSocket socket = (BluetoothSocket) m.invoke(actual, 1);
-					socket.connect();
-					ConnectedThread thread = new ConnectedThread(socket);
-					thread.start();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-					.show();
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-					.show();
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-					.show();
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-					.show();
-					e.printStackTrace();
+         if(adapter == null) {
+        	 Toast.makeText(this, "Could not find bluetooth adapter", Toast.LENGTH_LONG)
+				.show();
+         }
+         else {
+	         Set <BluetoothDevice> devices = adapter.getBondedDevices();
+	         BluetoothDevice actual;
+	         for (BluetoothDevice bondedDevice : devices) {
+				Log.d("test", "Device name: " + bondedDevice.getName());
+				if(bondedDevice.getName().equals("RN42-B6CD")){
+					actual = adapter.getRemoteDevice(bondedDevice.getAddress());
+					try {
+			            adapter.cancelDiscovery();
+	
+						 actual.createRfcommSocketToServiceRecord(MY_UUID);
+						Method m = actual.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+						BluetoothSocket socket = (BluetoothSocket) m.invoke(actual, 1);
+						socket.connect();
+						ConnectedThread thread = new ConnectedThread(socket);
+						thread.start();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
+						.show();
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
+						.show();
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
+						.show();
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
+						.show();
+						e.printStackTrace();
+					}
 				}
 			}
-		}
+         }
     }
 
     
