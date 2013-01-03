@@ -1,12 +1,10 @@
-package com.example.soundsensor;
+package com.drumm.drumm_android;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,12 +14,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
+import com.example.soundsensor.R;
 
 public class MainActivity extends Activity {
 

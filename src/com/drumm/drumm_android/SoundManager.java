@@ -1,4 +1,4 @@
-package com.example.soundsensor;
+package com.drumm.drumm_android;
 
 import java.util.HashMap;
 
@@ -6,6 +6,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
+
+import com.example.soundsensor.R;
 
 public class SoundManager {
 	

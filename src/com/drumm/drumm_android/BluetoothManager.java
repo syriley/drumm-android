@@ -1,4 +1,4 @@
-package com.example.soundsensor;
+package com.drumm.drumm_android;
 
 public class BluetoothManager {
 

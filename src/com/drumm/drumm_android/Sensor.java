@@ -1,4 +1,4 @@
-package com.example.soundsensor;
+package com.drumm.drumm_android;
 
 import java.util.LinkedList;
 import java.util.Queue;
