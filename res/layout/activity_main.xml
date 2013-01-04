@@ -4,33 +4,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <TextView
-       android:layout_width="fill_parent"
-       android:layout_height="wrap_content"
-       android:text="Audio experiments">
-    </TextView>
- 
-    <Button android:id="@+id/a_button"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:onClick="Audio1ButtonHandler"
-       android:text="Play">
-    </Button>
- 
-     <RadioGroup android:id="@+id/radioGroup1" android:layout_width="fill_parent"
-        android:layout_height="wrap_content" android:orientation="vertical">
-       <RadioButton android:id="@+id/radioSound1" android:text="Sound1"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content" />
-       <RadioButton android:id="@+id/radioSound2" android:text="Sound2"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content" />
-    </RadioGroup>
 
-     <TextView
-         android:id="@+id/textView1"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="TextView" />
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/drumkit_text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ListView
+         android:id="@+id/drumKitListView"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content" >
+    </ListView>
     
 </LinearLayout>
