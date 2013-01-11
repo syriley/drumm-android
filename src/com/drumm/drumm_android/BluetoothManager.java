@@ -1,10 +1,15 @@
 package com.drumm.drumm_android;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
@@ -22,9 +27,9 @@ public class BluetoothManager extends Thread {
          Log.d(TAG, "create BluetoothManager");
          this.socket = socket;
          pads = new ArrayList<Pad>();
+         pads.add(new Pad(0));
          pads.add(new Pad(1));
          pads.add(new Pad(2));
-         pads.add(new Pad(3));
          
          padTappedListeners = new ArrayList<OnPadTappedListener>();
          InputStream tmpIn = null;
@@ -45,35 +50,89 @@ public class BluetoothManager extends Thread {
 
      public void run() {
          Log.i(TAG, "BEGIN BluetoothManager Thread");
-         
-         // Keep listening to the InputStream while connected
-         while (true) {
-             try {
-                 List<Boolean> padValues = readPadValues();
-                 int count = 1;
-                 for (Boolean active : padValues) {
-                	 pads.get(count).setValue(active);
-                	 count++;
-                 }
-                     
-                 for(Pad pad : pads) {
-                	 if(pad.justTapped()){
-                		for (OnPadTappedListener padTappedListener : padTappedListeners) {
-                			 padTappedListener.onPadTapped(pad);	
-                 		}
-                	 }
-                 }
-             } 
-             catch (IOException e) {
-                 Log.e(TAG, "disconnected", e);
-                 //connectionLost();
-                 break;
-             }
-             catch (NumberFormatException e){
-             	Log.w(TAG, "could not parse int");
-             }
+         StringWriter writer = new StringWriter();
+         boolean start = false;
+         boolean error = false;
+         int count = 0;
+         byte[] buffer = new byte[3];
+         while(true) {
+            int theByte = -1;
+            
+            
+            try {
+                theByte = inStream.read();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if(theByte > 0) {
+                if(theByte == 60) {
+                    buffer = new byte[3];
+                    start = true;
+                    error = false;
+                    count = 0;
+                }
+                else if(theByte == 62 && !error) {
+                    String sensorValues = new String(buffer);
+                    Log.d(TAG, sensorValues + " : " +  + System.currentTimeMillis());
+                    for (int i = 0; i < 3; i++) {
+                        boolean active = false;
+                        if(buffer[i] == 49) {
+                            active = true;
+                        }
+                        pads.get(i).setValue(active);
+                        
+                        
+                    }
+                    
+                    for (Pad pad : pads) {
+                        if (pad.justTapped()) {
+                            for (OnPadTappedListener padTappedListener : padTappedListeners) {
+                                padTappedListener.onPadTapped(pad);
+                            }
+                        }
+                    }
+                }
+                else {
+                    try{
+                        buffer[count - 1] = (byte)theByte;
+                    }
+                    catch(ArrayIndexOutOfBoundsException e) {
+                        error = true;
+                        Log.e(TAG, "sensor reading error");
+                    }
+                }
+                count ++;
+            }
          }
+//         while (true) {
+//             try {
+//                 List<Boolean> padValues = readPadValues();
+//                 int count = 0;
+//                 for (Boolean active : padValues) {
+//                	 pads.get(count).setValue(active);
+//                	 count++;
+//                 }
+//                 
+//                for (Pad pad : pads) {
+//                    if (pad.justTapped()) {
+//                        for (OnPadTappedListener padTappedListener : padTappedListeners) {
+//                            padTappedListener.onPadTapped(pad);
+//                        }
+//                    }
+//                }
+//             } 
+//             catch (IOException e) {
+//                 Log.e(TAG, "disconnected", e);
+//                 //connectionLost();
+//                 break;
+//             }
+//             catch (NumberFormatException e){
+//             	Log.w(TAG, "could not parse int");
+//             }
+//         }
      }
+     
 
      public void cancel() {
          try {
@@ -84,25 +143,22 @@ public class BluetoothManager extends Thread {
      }
      
      private List<Boolean> readPadValues() throws IOException{
-    	 byte[] buffer = new byte[1024];
-         int bytes;
          List<Boolean> padValues = new ArrayList<Boolean>();
-         
-         bytes = inStream.read(buffer);
+         Log.d(TAG, "Reading Buffer: " + System.currentTimeMillis());
 
-         String bufferString = new String(buffer, 0, bytes);
-         //split on a new line as the buffer can have many liines
-         String[] bufferArray = bufferString.split("\\r\\n");
-         
+         InputStreamReader reader = new InputStreamReader(inStream);
+         BufferedReader bufferedReader = new BufferedReader(reader);
+         Log.d(TAG, "Buffer To String: " + System.currentTimeMillis());
          //get second line as this is more likely fully buffered
-         if(bufferArray.length > 1) {
-        	 String padString = bufferArray[1];
-             Log.d(TAG, padString);
-             List<String> padValuesList = Arrays.asList(padString.split(":"));
+         String line = bufferedReader.readLine(); 
+         if(line != null) {
+             //Log.d(TAG, padString);
+             List<String> padValuesList = Arrays.asList(line.split(":"));
              
              for(String padValue : padValuesList) {
             	 boolean active = false;
             	 if(padValue.equals("1")){
+            	     Log.i(TAG, "Pad Tapped:" + System.currentTimeMillis());
             		 active = true;
             	 }
             	 padValues.add(active);
@@ -110,4 +166,6 @@ public class BluetoothManager extends Thread {
          }
          return padValues;
      }
+     
+     
 }

@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
 import java.util.UUID;
 
 import android.app.Activity;
@@ -25,96 +27,98 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = "MainActivity";    
+    private static final String TAG = "MainActivity";
     private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a67");
     SoundManager soundManager;
-    
+
     private OnItemClickListener drumkitClickedHandler = new OnItemClickListener() {
-    	public void onItemClick(AdapterView parent, View v, int position, long id) {
-    		Toast.makeText(parent.getContext(), "item clicked", Toast.LENGTH_LONG)
-			.show();
-    		Intent drumKitIntent = new Intent(parent.getContext(), DrumkitActivity.class);
-    		startActivity(drumKitIntent);
-    	}
-	};
-	
-   private OnPadTappedListener padTappedListener = new OnPadTappedListener() {
-		
-		@Override
-		public void onPadTapped(Pad pad) {
-			Log.d(TAG, "Pad " + pad.getId() + " tapped");
-			soundManager.play(pad.getId());
-			
-		}
-	};
-    
+        public void onItemClick(AdapterView parent, View v, int position,
+                long id) {
+            Toast.makeText(parent.getContext(), "item clicked",Toast.LENGTH_LONG).show();
+            Intent drumKitIntent = new Intent(parent.getContext(), DrumkitActivity.class);
+            startActivity(drumKitIntent);
+        }
+    };
+
+    private OnPadTappedListener padTappedListener = new OnPadTappedListener() {
+        @Override
+        public void onPadTapped(Pad pad) {
+            Log.d(TAG, "Pad " + pad.getId() + " tapped at: " + System.currentTimeMillis());
+            SoundItem sound = new SoundItem(pad.getId(), 15);
+            soundManager.play(sound);
+
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	 super.onCreate(savedInstanceState);
-         setContentView(R.layout.activity_main);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        soundManager = new SoundManager(this);
+        soundManager.setPriority(Thread.MAX_PRIORITY);
+        soundManager.start();
 
-         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-         initialiseBluetooth();
-         List<String> drumKits = new ArrayList<String>();
-         drumKits.add("Rock");
-         drumKits.add("Jazz");
-         drumKits.add("Blues");
-         drumKits.add("Hip-Hop");
-         drumKits.add("Folk");
-         
-         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drumKits);
-         ListView drumkitListView = (ListView)findViewById(R.id.drumKitListView);
-         drumkitListView.setAdapter(adapter);
-         drumkitListView.setOnItemClickListener(drumkitClickedHandler);
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        initialiseBluetooth();
+        List<String> drumKits = new ArrayList<String>();
+        drumKits.add("Rock");
+        drumKits.add("Jazz");
+        drumKits.add("Blues");
+        drumKits.add("Hip-Hop");
+        drumKits.add("Folk");
+
+        ArrayAdapter<String> drumkitAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drumKits);
+        ListView drumkitListView = (ListView) findViewById(R.id.drumKitListView);
+        drumkitListView.setAdapter(drumkitAdapter);
+        drumkitListView.setOnItemClickListener(drumkitClickedHandler);
+//        while (true){
+//            SoundItem sound = new SoundItem(1, 5);
+//            soundManager.play(sound);
+//            try {
+//                Timer timer = new Timer();
+//                Thread.sleep(300);
+//                
+//                Log.d(TAG, "" + System.currentTimeMillis());
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
     }
-    
- 
-    private void initialiseBluetooth(){
-    	BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if(adapter == null) {
-       	 Toast.makeText(this, "Could not find bluetooth adapter", Toast.LENGTH_LONG)
-				.show();
-        }
+
+    private void initialiseBluetooth() {
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null) {
+            Toast.makeText(this, "Could not find bluetooth adapter",
+                    Toast.LENGTH_LONG).show();
+        } 
         else {
-	         Set <BluetoothDevice> devices = adapter.getBondedDevices();
-	         BluetoothDevice actual;
-	         for (BluetoothDevice bondedDevice : devices) {
-				Log.d("test", "Device name: " + bondedDevice.getName());
-				if(bondedDevice.getName().equals("RN42-B6CD")){
-					actual = adapter.getRemoteDevice(bondedDevice.getAddress());
-					try {
-			            adapter.cancelDiscovery();
-	
-						actual.createRfcommSocketToServiceRecord(MY_UUID);
-						Method m = actual.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-						BluetoothSocket socket = (BluetoothSocket) m.invoke(actual, 1);
-						socket.connect();
-						BluetoothManager bluetoothManager = new BluetoothManager(socket);
-						bluetoothManager.setPadTappedListener(padTappedListener);
-						bluetoothManager.start();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (NoSuchMethodException e) {
-						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-						.show();
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-						.show();
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-						.show();
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
-						.show();
-						e.printStackTrace();
-					}
-				}
-			}
-	         
+            Set<BluetoothDevice> devices = adapter.getBondedDevices();
+            BluetoothDevice actual;
+            for (BluetoothDevice bondedDevice : devices) {
+                Log.d("test", "Device name: " + bondedDevice.getName());
+                if (bondedDevice.getName().equals("RN42-B6CD")) {
+                    actual = adapter.getRemoteDevice(bondedDevice.getAddress());
+                    try {
+                        adapter.cancelDiscovery();
+                        actual.createRfcommSocketToServiceRecord(MY_UUID);
+                        Method m = actual.getClass()
+                                .getMethod("createRfcommSocket", new Class[] { int.class });
+                        BluetoothSocket socket = (BluetoothSocket) m.invoke(actual, 1);
+                        socket.connect();
+                        BluetoothManager bluetoothManager = new BluetoothManager(socket);
+                        bluetoothManager.setPadTappedListener(padTappedListener);
+                        bluetoothManager.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG)
+                                .show();
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         }
     }
 }
-
