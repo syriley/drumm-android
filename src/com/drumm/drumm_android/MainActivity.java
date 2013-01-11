@@ -85,13 +85,18 @@ public class MainActivity extends Activity {
 //            }
 //        }
     }
-
-    private void initialiseBluetooth() {
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter == null) {
-            Toast.makeText(this, "Could not find bluetooth adapter",
-                    Toast.LENGTH_LONG).show();
-        } 
+    
+ 
+    private void initialiseBluetooth(){
+    	BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if(adapter == null) {
+            AlertDialog.Builder builder - new AlertDialog.Builder(this());
+            builder.setTitle("No BlueTooth adapter");
+            builder.setMessage("Sorry we could not find a bluetooth adapter for this phone. Your Drumm beat-maker won't work without BlueTooth.");
+            builder.setIcon(android.R.drawable.ic_dialog_alert);
+            builder.setNeutralButton("Ok", null)
+            builder.show();
+        }
         else {
             Set<BluetoothDevice> devices = adapter.getBondedDevices();
             BluetoothDevice actual;
